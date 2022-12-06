@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"cosmossdk.io/collections"
 	"fmt"
 
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -66,6 +67,8 @@ type AccountKeeper struct {
 	// the address capable of executing a MsgUpdateParams message. Typically, this
 	// should be the x/gov module account.
 	authority string
+
+	ParamsS collections.Item[types.Params] // note name conflicts with method :(
 }
 
 var _ AccountKeeperI = &AccountKeeper{}
@@ -90,11 +93,12 @@ func NewAccountKeeper(
 
 	return AccountKeeper{
 		storeKey:   storeKey,
-		proto:      proto,
 		cdc:        cdc,
 		permAddrs:  permAddrs,
+		proto:      proto,
 		addressCdc: bech32Codec,
 		authority:  authority,
+		ParamsS:    collections.NewItem(storeKey, types.ParamsKey, collections.ProtoValueEncoder[types.Params](cdc)),
 	}
 }
 
